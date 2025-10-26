@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "limit_change_operation")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -17,7 +17,6 @@ public class User {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @OneToOne
-    @JoinColumn(name = "limit_id")
-    private Limit limit;
+    @Column(name = "limit_id")
+    private Long limitId;
 }

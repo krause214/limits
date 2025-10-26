@@ -1,4 +1,7 @@
 package ru.bbcv.model;
 
-public record LimitOperationExecutionResponseDto() {
+import ru.bbcv.entity.LimitChangeStatus;
+
+public record LimitOperationExecutionResponseDto(String operationId, LimitChangeStatus status) {
+
 }

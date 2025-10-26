@@ -1,4 +1,6 @@
 package ru.bbcv.model;
 
-public record LimitOperationRequestDto(LimitChangeStage stage) {
+import java.math.BigDecimal;
+
+public record LimitOperationRequestDto(Long processId, LimitChangeStage stage, String username, BigDecimal requestedAmount) {
 }

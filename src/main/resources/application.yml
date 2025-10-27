@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+application:
+  properties:
+    default-limit: 100000
+    refresh-limits-cron: "0 0 0 * * *"
+    operation-timeout-sec: 20
+
+spring:
+  flyway:
+    baseline-on-migrate: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/limits
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: none

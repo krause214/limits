@@ -17,6 +17,13 @@ public class User {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "limit_id")
-    private Long limitId;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Limit limit;
+
+    public void setLimit(Limit limit) {
+        this.limit = limit;
+        if (limit != null) {
+            limit.setUser(this);
+        }
+    }
 }

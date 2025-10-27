@@ -5,6 +5,7 @@ application:
   properties:
     default-limit: 100000
     refresh-limits-cron: "0 0 0 * * *"
+    operation-timeout-sec: 20
 
 spring:
   flyway:

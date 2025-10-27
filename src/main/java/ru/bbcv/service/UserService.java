@@ -3,6 +3,7 @@ package ru.bbcv.service;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
+import ru.bbcv.entity.Limit;
 import ru.bbcv.entity.User;
 import ru.bbcv.repository.UserRepository;
 
@@ -28,8 +29,10 @@ public class UserService {
         if (user.isEmpty()) {
             User userToCreate = new User();
             userToCreate.setUsername(username);
-            userToCreate.setLimit(limitService.createLimit(userToCreate));
-            return userRepository.save(userToCreate);
+            userToCreate = userRepository.save(userToCreate);
+            Limit limit = limitService.createLimit(userToCreate);
+            userToCreate.setLimit(limit);
+            return userToCreate;
         } else {
             return user.get();
         }

@@ -26,4 +26,7 @@ public class LimitChangeOperation {
     @Column(name = "reservation_amount")
     private BigDecimal reservationAmount;
 
+    @Column(name = "limit_id")
+    private Long limitId;
+
 }

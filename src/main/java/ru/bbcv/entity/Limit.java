@@ -17,7 +17,8 @@ public class Limit {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @MapsId
+    @JoinColumn(name = "id")
     private User user;
 
     @Column(name = "amount", nullable = false)

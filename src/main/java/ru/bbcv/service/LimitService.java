@@ -1,5 +1,6 @@
 package ru.bbcv.service;
 
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -7,8 +8,11 @@ import ru.bbcv.entity.Limit;
 import ru.bbcv.entity.User;
 import ru.bbcv.repository.LimitRepository;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class LimitService {
@@ -29,8 +33,19 @@ public class LimitService {
         return limitRepository.save(limit);
     }
 
-    public void decreaseLimit(Limit limit, BigDecimal decreaseAmount) {
+    @Transactional
+    public void decreaseLimit(Long limitId, BigDecimal decreaseAmount) {
+        Limit limit = Optional.ofNullable(getLimit(limitId))
+                .orElseThrow(NoSuchElementException::new);
         limit.setAmount(limit.getAmount().subtract(decreaseAmount));
+        limitRepository.save(limit);
+    }
+
+    @Transactional
+    public void increaseLimit(Long limitId, BigDecimal increaseAmount) {
+        Limit limit = Optional.ofNullable(getLimit(limitId))
+                .orElseThrow(NoSuchElementException::new);
+        limit.setAmount(limit.getAmount().add(increaseAmount));
         limitRepository.save(limit);
     }
 
@@ -40,5 +55,11 @@ public class LimitService {
             limit.setAmount(defaultLimitAmount);
             limitRepository.save(limit);
         }
+    }
+
+    @Nullable
+    public Limit getLimit(Long id) {
+        return limitRepository.findById(id)
+                .orElse(null);
     }
 }

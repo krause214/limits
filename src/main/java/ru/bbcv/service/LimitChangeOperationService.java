@@ -24,6 +24,7 @@ public class LimitChangeOperationService {
     @Transactional
     public LimitChangeOperation createProcess(User user, BigDecimal requestedAmount) {
         LimitChangeOperation limitChangeOperation = new LimitChangeOperation();
+        limitChangeOperation.setLimitId(user.getLimit().getId());
         limitChangeOperation.setUsername(user.getUsername());
         limitChangeOperation.setReservationAmount(requestedAmount);
         limitChangeOperationRepository.save(limitChangeOperation);

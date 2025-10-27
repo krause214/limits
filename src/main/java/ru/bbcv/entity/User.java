@@ -7,7 +7,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "limit_change_operation")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -17,7 +17,13 @@ public class User {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @OneToOne
-    @JoinColumn(name = "limit_id")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Limit limit;
+
+    public void setLimit(Limit limit) {
+        this.limit = limit;
+        if (limit != null) {
+            limit.setUser(this);
+        }
+    }
 }

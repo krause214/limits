@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "limit_change_operation")
+@Table(name = "limits")
 public class Limit {
 
     @Id
@@ -17,10 +17,11 @@ public class Limit {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @MapsId
+    @JoinColumn(name = "id")
     private User user;
 
-    @Column(name = "amount")
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
 }

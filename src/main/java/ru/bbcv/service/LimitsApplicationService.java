@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class LimitsService {
+public class LimitsApplicationService {
 
     private final Map<LimitChangeStage, LimitChangeExecutor> paymentExecutors;
 
-    public LimitsService(List<LimitChangeExecutor> paymentExecutors) {
+    public LimitsApplicationService(List<LimitChangeExecutor> paymentExecutors) {
         this.paymentExecutors = paymentExecutors.stream()
                 .collect(Collectors.toMap(LimitChangeExecutor::getLimitOperationStage,
                         executor -> executor));

@@ -6,21 +6,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.bbcv.model.LimitOperationExecutionResponseDto;
 import ru.bbcv.model.LimitOperationRequestDto;
-import ru.bbcv.service.LimitsService;
+import ru.bbcv.service.LimitsApplicationService;
 
 @RestController
 @RequestMapping("/api/limits")
 public class LimitsController {
 
-    private final LimitsService limitsService;
+    private final LimitsApplicationService limitsApplicationService;
 
-    public LimitsController(LimitsService limitsService) {
-        this.limitsService = limitsService;
+    public LimitsController(LimitsApplicationService limitsApplicationService) {
+        this.limitsApplicationService = limitsApplicationService;
     }
 
     @PostMapping("/change-limit/execute")
     public LimitOperationExecutionResponseDto executePayment(@RequestBody LimitOperationRequestDto requestDto) {
-        return limitsService.executeRequest(requestDto);
+        return limitsApplicationService.executeRequest(requestDto);
     }
 
 }

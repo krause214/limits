@@ -8,17 +8,20 @@ import ru.bbcv.model.LimitChangeStage;
 import ru.bbcv.model.LimitOperationExecutionResponseDto;
 import ru.bbcv.model.LimitOperationRequestDto;
 import ru.bbcv.service.LimitChangeOperationService;
+import ru.bbcv.service.LimitService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class AcceptLimitChangeExecutor extends LimitChangeExecutor {
+public class DeclineLimitChangeExecutor extends LimitChangeExecutor {
 
     private final LimitChangeOperationService limitChangeOperationService;
+    private final LimitService limitService;
 
-    public AcceptLimitChangeExecutor(LimitChangeOperationService limitChangeOperationService) {
+    public DeclineLimitChangeExecutor(LimitChangeOperationService limitChangeOperationService, LimitService limitService) {
         this.limitChangeOperationService = limitChangeOperationService;
+        this.limitService = limitService;
     }
 
 
@@ -34,8 +37,8 @@ public class AcceptLimitChangeExecutor extends LimitChangeExecutor {
             if (!operation.getStatus().equals(LimitChangeStatus.RESERVED)) {
                 throw new IllegalStateException(String.format("Невозможно продолжить заявку в финальном статусе %s", operation.getStatus()));
             }
-
-            operation.setStatus(LimitChangeStatus.DONE);
+            limitService.increaseLimit(operation.getLimitId(), operation.getReservationAmount());
+            operation.setStatus(LimitChangeStatus.DECLINED);
             limitChangeOperationService.save(operation);
             return mapToDto(operation);
         } catch (Exception e) {
@@ -63,6 +66,6 @@ public class AcceptLimitChangeExecutor extends LimitChangeExecutor {
 
     @Override
     public LimitChangeStage getLimitOperationStage() {
-        return LimitChangeStage.ACCEPT;
+        return LimitChangeStage.DECLINE;
     }
 }

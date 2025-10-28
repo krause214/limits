@@ -42,8 +42,8 @@ public class ReserveLimitChangeExecutor extends LimitChangeExecutor {
         validateRequest(requestDto);
 
         LimitChangeOperation limitChangeOperation;
-        String username = requestDto.username();
-        Limit limit = limitService.getOrCreateLimit(username);
+        String userId = requestDto.userId();
+        Limit limit = limitService.getOrCreateLimit(userId);
         limitChangeOperation = limitChangeOperationService.createProcess(limit, requestDto.requestedAmount());
         try {
             if (limit.getAmount().compareTo(requestDto.requestedAmount()) < 0) {
@@ -73,8 +73,8 @@ public class ReserveLimitChangeExecutor extends LimitChangeExecutor {
     private void validateRequest(LimitOperationRequestDto requestDto) {
         List<String> errorList = new ArrayList<>();
 
-        if (StringUtil.isNullOrEmpty(requestDto.username())) {
-            errorList.add("Передано пустое значение request.username");
+        if (StringUtil.isNullOrEmpty(requestDto.userId())) {
+            errorList.add("Передано пустое значение request.userId");
         }
         if (requestDto.requestedAmount() == null
                 || requestDto.requestedAmount().compareTo(BigDecimal.ZERO) <= 0) {

@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface LimitRepository extends JpaRepository<Limit, Long> {
-    Optional<Limit> findByUsername(String username);
+    Optional<Limit> findByUserId(String userId);
 }

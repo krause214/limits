@@ -16,8 +16,8 @@ public class Limit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", nullable = false)
-    private String username;
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;

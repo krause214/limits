@@ -20,8 +20,8 @@ public class LimitChangeOperation {
     @Enumerated(EnumType.STRING)
     private LimitChangeStatus status;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "user_id")
+    private String userId;
 
     @Column(name = "reservation_amount")
     private BigDecimal reservationAmount;

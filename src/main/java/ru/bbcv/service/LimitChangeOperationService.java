@@ -22,7 +22,7 @@ public class LimitChangeOperationService {
     public LimitChangeOperation createProcess(Limit limit, BigDecimal requestedAmount) {
         LimitChangeOperation limitChangeOperation = new LimitChangeOperation();
         limitChangeOperation.setLimitId(limit.getId());
-        limitChangeOperation.setUsername(limit.getUsername());
+        limitChangeOperation.setUserId(limit.getUserId());
         limitChangeOperation.setReservationAmount(requestedAmount);
         limitChangeOperationRepository.save(limitChangeOperation);
         return limitChangeOperation;

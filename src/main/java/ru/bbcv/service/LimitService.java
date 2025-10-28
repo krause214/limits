@@ -72,11 +72,11 @@ public class LimitService {
 
     @NonNull
     @Transactional
-    public Limit getOrCreateLimit(String username) {
-        Optional<Limit> limit = limitRepository.findByUsername(username);
+    public Limit getOrCreateLimit(String userId) {
+        Optional<Limit> limit = limitRepository.findByUserId(userId);
         return limit.orElseGet(() -> {
                     Limit limitToCreate = new Limit();
-                    limitToCreate.setUsername(username);
+                    limitToCreate.setUserId(userId);
                     limitToCreate.setAmount(defaultLimitAmount);
                     return limitRepository.save(limitToCreate);
                 }

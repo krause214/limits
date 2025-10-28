@@ -1,6 +1,7 @@
 package ru.bbcv.service;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +13,10 @@ import ru.bbcv.repository.LimitChangeOperationRepository;
 import ru.bbcv.repository.LimitRepository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class LimitService {
@@ -33,16 +34,14 @@ public class LimitService {
 
     @Transactional
     public void decreaseLimit(Long limitId, BigDecimal decreaseAmount) {
-        Limit limit = Optional.ofNullable(getLimit(limitId))
-                .orElseThrow(NoSuchElementException::new);
+        Limit limit = getLimit(limitId);
         limit.setAmount(limit.getAmount().subtract(decreaseAmount));
         limitRepository.save(limit);
     }
 
     @Transactional
     public void increaseLimit(Long limitId, BigDecimal increaseAmount) {
-        Limit limit = Optional.ofNullable(getLimit(limitId))
-                .orElseThrow(NoSuchElementException::new);
+        Limit limit = getLimit(limitId);
         limit.setAmount(limit.getAmount().add(increaseAmount));
         if (limit.getAmount().compareTo(defaultLimitAmount) > 0) {
             limit.setAmount(defaultLimitAmount);
@@ -50,22 +49,25 @@ public class LimitService {
         limitRepository.save(limit);
     }
 
+    @Transactional
     public void refreshAll() {
         List<Limit> limitList = limitRepository.findAll();
+        List<Limit> limitListToUpdate = new ArrayList<>();
         for (Limit limit : limitList) {
-            BigDecimal reservedSum = operationRepository.findByUsernameContaining(limit.getUsername())
+            BigDecimal reservedSum = operationRepository.findByLimitId(limit.getId())
                             .stream().filter(o -> LimitChangeStatus.RESERVED.equals(o.getStatus()))
                             .map(LimitChangeOperation::getReservationAmount)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
             limit.setAmount(defaultLimitAmount.subtract(reservedSum));
-            limitRepository.save(limit);
+            limitListToUpdate.add(limit);
         }
+        limitRepository.saveAll(limitListToUpdate);
     }
 
-    @Nullable
+    @NonNull
     public Limit getLimit(Long id) {
         return limitRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new EntityNotFoundException("Не найден лимит"));
     }
 
     @NonNull

@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface LimitChangeOperationRepository extends JpaRepository<LimitChangeOperation, Long> {
     List<LimitChangeOperation> findByUsernameContaining(String username);
+    List<LimitChangeOperation> findByLimitId(Long limitId);
 }

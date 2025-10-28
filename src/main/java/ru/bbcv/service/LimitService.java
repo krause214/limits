@@ -22,14 +22,12 @@ import java.util.Optional;
 public class LimitService {
 
     private final LimitRepository limitRepository;
-    private final LimitChangeOperationRepository operationRepository;
 
     @Value("${application.properties.default-limit}")
     private BigDecimal defaultLimitAmount;
 
-    public LimitService(LimitRepository limitRepository, LimitChangeOperationRepository operationRepository) {
+    public LimitService(LimitRepository limitRepository) {
         this.limitRepository = limitRepository;
-        this.operationRepository = operationRepository;
     }
 
     @Transactional
@@ -47,21 +45,6 @@ public class LimitService {
             limit.setAmount(defaultLimitAmount);
         }
         limitRepository.save(limit);
-    }
-
-    @Transactional
-    public void refreshAll() {
-        List<Limit> limitList = limitRepository.findAll();
-        List<Limit> limitListToUpdate = new ArrayList<>();
-        for (Limit limit : limitList) {
-            BigDecimal reservedSum = operationRepository.findByLimitId(limit.getId())
-                            .stream().filter(o -> LimitChangeStatus.RESERVED.equals(o.getStatus()))
-                            .map(LimitChangeOperation::getReservationAmount)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
-            limit.setAmount(defaultLimitAmount.subtract(reservedSum));
-            limitListToUpdate.add(limit);
-        }
-        limitRepository.saveAll(limitListToUpdate);
     }
 
     @NonNull

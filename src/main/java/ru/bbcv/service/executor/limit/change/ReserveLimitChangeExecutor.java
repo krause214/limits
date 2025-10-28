@@ -7,35 +7,30 @@ import org.springframework.stereotype.Service;
 import ru.bbcv.entity.Limit;
 import ru.bbcv.entity.LimitChangeOperation;
 import ru.bbcv.entity.LimitChangeStatus;
-import ru.bbcv.entity.User;
 import ru.bbcv.model.LimitChangeStage;
 import ru.bbcv.model.LimitOperationExecutionResponseDto;
 import ru.bbcv.model.LimitOperationRequestDto;
 import ru.bbcv.service.LimitChangeOperationService;
 import ru.bbcv.service.LimitService;
 import ru.bbcv.service.ReservationTimeoutService;
-import ru.bbcv.service.UserService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ReserveLimitChangeExecutor extends LimitChangeExecutor {
 
     private final LimitChangeOperationService limitChangeOperationService;
     private final LimitService limitService;
-    private final UserService userService;
     private final ApplicationContext applicationContext;
 
 
     public ReserveLimitChangeExecutor(LimitChangeOperationService limitChangeOperationService,
                                       LimitService limitService,
-                                      UserService userService, ApplicationContext applicationContext) {
+                                      ApplicationContext applicationContext) {
         this.limitChangeOperationService = limitChangeOperationService;
         this.limitService = limitService;
-        this.userService = userService;
         this.applicationContext = applicationContext;
     }
 
@@ -48,11 +43,9 @@ public class ReserveLimitChangeExecutor extends LimitChangeExecutor {
 
         LimitChangeOperation limitChangeOperation;
         String username = requestDto.username();
-        User user = userService.getOrCreateUser(username);
-        limitChangeOperation = limitChangeOperationService.createProcess(user, requestDto.requestedAmount());
+        Limit limit = limitService.getOrCreateLimit(username);
+        limitChangeOperation = limitChangeOperationService.createProcess(limit, requestDto.requestedAmount());
         try {
-            Limit limit = Optional.ofNullable(limitService.getLimit(user.getLimit().getId()))
-                    .orElseThrow(() -> new IllegalStateException("У данного пользователя нет зарегистрированного лимита"));
             if (limit.getAmount().compareTo(requestDto.requestedAmount()) < 0) {
                 throw new IllegalStateException(String.format("Запрошенная сумма превышает допустимый лимит - %s", limit.getAmount()));
             }

@@ -21,8 +21,7 @@ public class LimitsApplicationService {
                         executor -> executor));
     }
 
-    public LimitOperationExecutionResponseDto executeRequest(LimitOperationRequestDto request) {
-        return paymentExecutors.get(request.stage()).executeStage(request);
+    public LimitOperationExecutionResponseDto executeRequest(LimitOperationRequestDto requestDto, LimitChangeStage stage) {
+        return paymentExecutors.get(stage).executeStage(requestDto);
     }
-
 }

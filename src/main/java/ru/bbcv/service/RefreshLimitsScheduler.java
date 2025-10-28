@@ -13,7 +13,7 @@ public class RefreshLimitsScheduler {
     }
 
     @Scheduled(cron = "${application.properties.refresh-limits-cron}")
-    public void refreshLimits(){
+    public void refreshLimits() {
         limitService.refreshAll();
     }
 

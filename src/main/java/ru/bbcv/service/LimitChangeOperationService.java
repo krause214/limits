@@ -4,13 +4,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.bbcv.entity.Limit;
 import ru.bbcv.entity.LimitChangeOperation;
-import ru.bbcv.entity.LimitChangeStatus;
-import ru.bbcv.entity.User;
 import ru.bbcv.repository.LimitChangeOperationRepository;
 
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class LimitChangeOperationService {
@@ -22,10 +19,10 @@ public class LimitChangeOperationService {
     private final LimitChangeOperationRepository limitChangeOperationRepository;
 
     @Transactional
-    public LimitChangeOperation createProcess(User user, BigDecimal requestedAmount) {
+    public LimitChangeOperation createProcess(Limit limit, BigDecimal requestedAmount) {
         LimitChangeOperation limitChangeOperation = new LimitChangeOperation();
-        limitChangeOperation.setLimitId(user.getLimit().getId());
-        limitChangeOperation.setUsername(user.getUsername());
+        limitChangeOperation.setLimitId(limit.getId());
+        limitChangeOperation.setUsername(limit.getUsername());
         limitChangeOperation.setReservationAmount(requestedAmount);
         limitChangeOperationRepository.save(limitChangeOperation);
         return limitChangeOperation;

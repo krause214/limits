@@ -2,35 +2,33 @@ package ru.bbcv.service;
 
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.bbcv.entity.Limit;
-import ru.bbcv.entity.User;
+import ru.bbcv.entity.LimitChangeOperation;
+import ru.bbcv.entity.LimitChangeStatus;
+import ru.bbcv.repository.LimitChangeOperationRepository;
 import ru.bbcv.repository.LimitRepository;
 
-import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LimitService {
 
     private final LimitRepository limitRepository;
+    private final LimitChangeOperationRepository operationRepository;
 
     @Value("${application.properties.default-limit}")
     private BigDecimal defaultLimitAmount;
 
-    public LimitService(LimitRepository limitRepository) {
+    public LimitService(LimitRepository limitRepository, LimitChangeOperationRepository operationRepository) {
         this.limitRepository = limitRepository;
-    }
-
-    public Limit createLimit(User user) {
-        Limit limit = new Limit();
-        limit.setAmount(defaultLimitAmount);
-        limit.setUser(user);
-        return limitRepository.save(limit);
+        this.operationRepository = operationRepository;
     }
 
     @Transactional
@@ -46,13 +44,20 @@ public class LimitService {
         Limit limit = Optional.ofNullable(getLimit(limitId))
                 .orElseThrow(NoSuchElementException::new);
         limit.setAmount(limit.getAmount().add(increaseAmount));
+        if (limit.getAmount().compareTo(defaultLimitAmount) > 0) {
+            limit.setAmount(defaultLimitAmount);
+        }
         limitRepository.save(limit);
     }
 
     public void refreshAll() {
         List<Limit> limitList = limitRepository.findAll();
         for (Limit limit : limitList) {
-            limit.setAmount(defaultLimitAmount);
+            BigDecimal reservedSum = operationRepository.findByUsernameContaining(limit.getUsername())
+                            .stream().filter(o -> LimitChangeStatus.RESERVED.equals(o.getStatus()))
+                            .map(LimitChangeOperation::getReservationAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+            limit.setAmount(defaultLimitAmount.subtract(reservedSum));
             limitRepository.save(limit);
         }
     }
@@ -61,5 +66,18 @@ public class LimitService {
     public Limit getLimit(Long id) {
         return limitRepository.findById(id)
                 .orElse(null);
+    }
+
+    @NonNull
+    @Transactional
+    public Limit getOrCreateLimit(String username) {
+        Optional<Limit> limit = limitRepository.findByUsername(username);
+        return limit.orElseGet(() -> {
+                    Limit limitToCreate = new Limit();
+                    limitToCreate.setUsername(username);
+                    limitToCreate.setAmount(defaultLimitAmount);
+                    return limitRepository.save(limitToCreate);
+                }
+        );
     }
 }

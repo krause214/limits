@@ -16,10 +16,8 @@ public class Limit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "id")
-    private User user;
+    @Column(name = "username", nullable = false)
+    private String username;
 
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
